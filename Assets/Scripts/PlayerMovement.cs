@@ -17,7 +17,18 @@ public class PlayerMovement : MonoBehaviour
     private float jumpTime = 0.5f;
     private float initialJumpVelocity;
 
-    // Update is called once per frame
+    private float jumpsMax = 2;
+    private float usedJumps = 0;
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Finish")
+        {
+            Debug.Log("You win!");
+        }
+    }
+
 
     private void Start()
     {
@@ -40,10 +51,12 @@ public class PlayerMovement : MonoBehaviour
         if (cc.isGrounded && yVelocity < 0.0f)
         {
             yVelocity = groundedYVelocity;
+            usedJumps = 0;
         }
 
-        if(Input.GetButtonDown("Jump") && cc.isGrounded)
+        if(Input.GetButtonDown("Jump") /*&& cc.isGrounded*/ && usedJumps < jumpsMax)
         {
+            usedJumps++;
             yVelocity = initialJumpVelocity;
         }
         movement.y = yVelocity;
@@ -60,8 +73,10 @@ public class PlayerMovement : MonoBehaviour
         transform.Rotate(rotation);
     }
 
-    private void FixedUpdate()
+    public void Respawn(Vector3 spawnPoint)
     {
-        
+        yVelocity = groundedYVelocity;
+        transform.position = spawnPoint;
+        Physics.SyncTransforms();
     }
 }
