@@ -17,6 +17,9 @@ public class PlayerMovement : MonoBehaviour
     private float jumpTime = 0.5f;
     private float initialJumpVelocity;
 
+    private float maxJumps = 2;
+    private float jumpCount = 0;
+
     // Update is called once per frame
 
     private void Start()
@@ -40,11 +43,13 @@ public class PlayerMovement : MonoBehaviour
         if (cc.isGrounded && yVelocity < 0.0f)
         {
             yVelocity = groundedYVelocity;
+            jumpCount = 0;
         }
 
-        if(Input.GetButtonDown("Jump") && cc.isGrounded)
+        if(Input.GetButtonDown("Jump") && /*cc.isGrounded*/ jumpCount < maxJumps)
         {
             yVelocity = initialJumpVelocity;
+            jumpCount++;
         }
         movement.y = yVelocity;
 
@@ -58,6 +63,24 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 rotation = Vector3.up * rotationSpeed * Time.deltaTime * Input.GetAxis("Mouse X");
         transform.Rotate(rotation);
+    }
+
+    public void Respawn(Vector3 spawnPoint)
+    {
+        // stop falling
+        yVelocity = groundedYVelocity;
+        // set the player to a given position
+        transform.position = spawnPoint;
+        // apply transform changes to the physics engine manually
+        Physics.SyncTransforms();
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Finish")
+        {
+            Debug.Log("Yay");
+        }
     }
 
     private void FixedUpdate()
